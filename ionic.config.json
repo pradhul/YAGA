@@ -1,0 +1,7 @@
+{
+  "name": "YAGA",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
