@@ -10,4 +10,8 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'quick-add',
+    loadComponent: () => import('./pages/quick-add/quick-add.page').then( m => m.QuickAddPage)
+  },
 ];
