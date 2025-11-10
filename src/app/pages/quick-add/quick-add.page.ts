@@ -1,7 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, IonSearchbar } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButtons,
+  IonButton,
+  IonIcon,
+  IonSearchbar,
+  IonLabel,
+  IonList,
+  IonItem,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 
@@ -10,15 +24,71 @@ import { addOutline } from 'ionicons/icons';
   templateUrl: './quick-add.page.html',
   styleUrls: ['./quick-add.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonButton, IonIcon, IonSearchbar]
+  imports: [
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    CommonModule,
+    FormsModule,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonSearchbar,
+    IonLabel,
+    IonList,
+    IonItem,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
+  ],
 })
 export class QuickAddPage implements OnInit {
-
   constructor() {
     addIcons({ addOutline });
   }
 
+  groceryItems = [
+    'Apples',
+    'Bananas',
+    'Bread',
+    'Milk',
+    'Eggs',
+    'Cheese',
+    'Chicken',
+    'Rice',
+    'Pasta',
+    'Tomatoes',
+    'Onions',
+    'Potatoes',
+    'Carrots',
+    'Lettuce',
+    'Yogurt',
+    'Butter',
+    'Coffee',
+    'Tea',
+    'Sugar',
+    'Salt',
+  ];
+  displayedItems: string[] = [];
+  currentIndex = 0;
+  itemsPerLoad = 20;
+
   ngOnInit() {
+    this.loadMoreItems();
   }
 
+  loadMoreItems() {
+    console.log('Loading...more');
+    for (let i = 0; i < this.itemsPerLoad; i++) {
+      const item =
+        this.groceryItems[this.currentIndex % this.groceryItems.length];
+      this.displayedItems.push(item);
+      this.currentIndex++;
+    }
+  }
+
+  onScroll(event: any) {
+    this.loadMoreItems();
+    event.target.complete();
+  }
 }
