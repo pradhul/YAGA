@@ -2,7 +2,9 @@
   <ion-toolbar>
     <ion-title>Quick Add</ion-title>
     <ion-buttons slot="end">
-      <ion-button ><ion-icon name="add-outline"></ion-icon></ion-button>
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -15,9 +17,11 @@
   </ion-header>
   <ion-searchbar animated="true" placeholder="Animated" (ionInput) = "onSearChange($event)"></ion-searchbar>
   <ion-list>
-    <ion-item *ngFor="let item of displayedItems">
-      <ion-label>{{item}}</ion-label>
-    </ion-item>
+    @for (item of displayedItems; track $index) {
+      <ion-item>
+        {{item}}
+      </ion-item>
+    }
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="onScroll($event)">
   <ion-infinite-scroll-content></ion-infinite-scroll-content>

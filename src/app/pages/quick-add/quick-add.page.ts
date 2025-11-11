@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule, Location } from '@angular/common';
 import {
   IonContent,
   IonHeader,
@@ -10,7 +9,6 @@ import {
   IonButton,
   IonIcon,
   IonSearchbar,
-  IonLabel,
   IonList,
   IonItem,
   IonInfiniteScroll,
@@ -18,7 +16,7 @@ import {
   SearchbarInputEventDetail,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline } from 'ionicons/icons';
+import { arrowBackOutline } from 'ionicons/icons';
 import { IonSearchbarCustomEvent } from '@ionic/core';
 
 @Component({
@@ -32,45 +30,48 @@ import { IonSearchbarCustomEvent } from '@ionic/core';
     IonTitle,
     IonToolbar,
     CommonModule,
-    FormsModule,
     IonButtons,
     IonButton,
     IonIcon,
     IonSearchbar,
-    IonLabel,
     IonList,
     IonItem,
     IonInfiniteScroll,
-    IonInfiniteScrollContent,
+    IonInfiniteScrollContent
   ],
 })
 export class QuickAddPage implements OnInit {
+
   searchTerm: string | undefined;
-  constructor() {
-    addIcons({ addOutline });
+  constructor(private location: Location) {
+    addIcons({ arrowBackOutline });
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   groceryItems = [
-    'Apples',
-    'Bananas',
-    'Bread',
-    'Milk',
-    'Eggs',
-    'Cheese',
-    'Chicken',
-    'Rice',
-    'Pasta',
-    'Tomatoes',
-    'Onions',
-    'Potatoes',
-    'Carrots',
-    'Lettuce',
-    'Yogurt',
-    'Butter',
-    'Coffee',
-    'Tea',
-    'Sugar',
-    'Salt',
+    'Apples 🍎',
+    'Bananas 🍌',
+    'Bread 🍞',
+    'Milk 🥛',
+    'Eggs 🥚',
+    'Cheese 🧀',
+    'Chicken 🍗',
+    'Rice 🍙',
+    'Pasta 🍝',
+    'Tomatoes 🍅',
+    'Onions 🧅',
+    'Potatoes 🥔',
+    'Carrots 🥕',
+    'Lettuce 🥗',
+    'Yogurt 🍦',
+    'Butter 🧈',
+    'Coffee ☕',
+    'Tea 🍃',
+    'Sugar 🍬',
+    'Salt 🧂',
   ];
   displayedItems: string[] = [];
   currentIndex = 0;
