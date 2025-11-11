@@ -15,9 +15,11 @@ import {
   IonItem,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  SearchbarInputEventDetail,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
+import { IonSearchbarCustomEvent } from '@ionic/core';
 
 @Component({
   selector: 'app-quick-add',
@@ -43,6 +45,7 @@ import { addOutline } from 'ionicons/icons';
   ],
 })
 export class QuickAddPage implements OnInit {
+  searchTerm: string | undefined;
   constructor() {
     addIcons({ addOutline });
   }
@@ -73,15 +76,29 @@ export class QuickAddPage implements OnInit {
   currentIndex = 0;
   itemsPerLoad = 20;
 
+  resetAndFilter() {
+    this.displayedItems = [];
+    this.currentIndex = 0;
+    this.loadMoreItems();
+  }
+
+  onSearChange($event: IonSearchbarCustomEvent<SearchbarInputEventDetail>) {
+    this.searchTerm = $event.detail.value?.toLowerCase();
+    this.resetAndFilter();
+  }
+
   ngOnInit() {
     this.loadMoreItems();
   }
 
   loadMoreItems() {
-    console.log('Loading...more');
     for (let i = 0; i < this.itemsPerLoad; i++) {
-      const item =
-        this.groceryItems[this.currentIndex % this.groceryItems.length];
+      const item = this.groceryItems[this.currentIndex % this.groceryItems.length];
+      if (this.searchTerm && !item.toLocaleLowerCase().includes(this.searchTerm)
+      ) {
+        this.currentIndex++;
+        continue;
+      }
       this.displayedItems.push(item);
       this.currentIndex++;
     }

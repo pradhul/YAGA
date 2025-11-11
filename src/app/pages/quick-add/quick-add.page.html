@@ -13,7 +13,7 @@
       <ion-title size="large">quick-add</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-searchbar animated="true" placeholder="Animated"></ion-searchbar>
+  <ion-searchbar animated="true" placeholder="Animated" (ionInput) = "onSearChange($event)"></ion-searchbar>
   <ion-list>
     <ion-item *ngFor="let item of displayedItems">
       <ion-label>{{item}}</ion-label>
