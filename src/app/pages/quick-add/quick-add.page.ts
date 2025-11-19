@@ -18,6 +18,7 @@ import {
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { IonSearchbarCustomEvent } from '@ionic/core';
+import { QuickListItemComponent } from "src/app/components/quick-list-item/quick-list-item.component";
 
 @Component({
   selector: 'app-quick-add',
@@ -35,9 +36,9 @@ import { IonSearchbarCustomEvent } from '@ionic/core';
     IonIcon,
     IonSearchbar,
     IonList,
-    IonItem,
     IonInfiniteScroll,
-    IonInfiniteScrollContent
+    IonInfiniteScrollContent,
+    QuickListItemComponent
   ],
 })
 export class QuickAddPage implements OnInit {
@@ -108,5 +109,9 @@ export class QuickAddPage implements OnInit {
   onScroll(event: any) {
     this.loadMoreItems();
     event.target.complete();
+  }
+
+  handleItemAdd(item: any) {
+    console.log('Item added:', item);
   }
 }
