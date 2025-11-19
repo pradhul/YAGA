@@ -14,4 +14,8 @@ export const routes: Routes = [
     path: 'quick-add',
     loadComponent: () => import('./pages/quick-add/quick-add.page').then( m => m.QuickAddPage)
   },
+  {
+    path: 'buimetric-setup',
+    loadComponent: () => import('./pages/biometric-setup/biometric-setup.page').then(m => m.BuimetricSetupPage)
+  },
 ];
