@@ -18,9 +18,11 @@
   <ion-searchbar animated="true" placeholder="Animated" (ionInput) = "onSearChange($event)"></ion-searchbar>
   <ion-list>
     @for (item of displayedItems; track $index) {
-      <ion-item>
-        {{item}}
-      </ion-item>
+      <app-quick-list-item
+      [item] = "item"
+      (add) = "handleItemAdd($event)"
+      >
+      </app-quick-list-item>
     }
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="onScroll($event)">
