@@ -1,6 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Age } from '../services/grocery.service';
 
+/**
+ * pipe to transform item elapsed time, age into readable format
+ * input should be of number+"sec|min|hour|days|month" or just "now"
+ */
+
 @Pipe({
   name: 'ageReadable',
   standalone: true
