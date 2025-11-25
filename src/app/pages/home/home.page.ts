@@ -31,7 +31,7 @@ export class HomePage {
 
   constructor(private groceryService: GroceryService, private router: Router) {
     addIcons({ addOutline })
-    this.groceryList = this.groceryService.getGroceryList();
+    this.groceryList = this.groceryService.getCurrentGroceryList();
   }
 
   navigateToQuickAdd() {

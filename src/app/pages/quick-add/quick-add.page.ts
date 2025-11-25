@@ -19,6 +19,7 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { IonSearchbarCustomEvent } from '@ionic/core';
 import { QuickListItemComponent } from "src/app/components/quick-list-item/quick-list-item.component";
+import { GroceryItem, GroceryService } from 'src/app/services/grocery.service';
 
 @Component({
   selector: 'app-quick-add',
@@ -44,36 +45,17 @@ import { QuickListItemComponent } from "src/app/components/quick-list-item/quick
 export class QuickAddPage implements OnInit {
 
   searchTerm: string | undefined;
-  constructor(private location: Location) {
+  groceryItems: GroceryItem[] = [];
+
+  constructor(private location: Location, private groceryService: GroceryService) {
     addIcons({ arrowBackOutline });
+    this.groceryItems = this.groceryService.getAllGroceries();
   }
 
   goBack() {
     this.location.back();
   }
 
-  groceryItems = [
-    'Apples 🍎',
-    'Bananas 🍌',
-    'Bread 🍞',
-    'Milk 🥛',
-    'Eggs 🥚',
-    'Cheese 🧀',
-    'Chicken 🍗',
-    'Rice 🍙',
-    'Pasta 🍝',
-    'Tomatoes 🍅',
-    'Onions 🧅',
-    'Potatoes 🥔',
-    'Carrots 🥕',
-    'Lettuce 🥗',
-    'Yogurt 🍦',
-    'Butter 🧈',
-    'Coffee ☕',
-    'Tea 🍃',
-    'Sugar 🍬',
-    'Salt 🧂',
-  ];
   displayedItems: string[] = [];
   currentIndex = 0;
   itemsPerLoad = 20;
@@ -96,12 +78,12 @@ export class QuickAddPage implements OnInit {
   loadMoreItems() {
     for (let i = 0; i < this.itemsPerLoad; i++) {
       const item = this.groceryItems[this.currentIndex % this.groceryItems.length];
-      if (this.searchTerm && !item.toLocaleLowerCase().includes(this.searchTerm)
+      if (this.searchTerm && !item.name.toLocaleLowerCase().includes(this.searchTerm)
       ) {
         this.currentIndex++;
         continue;
       }
-      this.displayedItems.push(item);
+      this.displayedItems.push(item.name);
       this.currentIndex++;
     }
   }
