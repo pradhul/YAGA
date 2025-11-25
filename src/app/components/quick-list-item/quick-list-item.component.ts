@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonItem, IonLabel, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
+import { GroceryItem } from 'src/app/services/grocery.service';
 
 @Component({
   selector: 'app-quick-list-item',
@@ -17,13 +18,13 @@ export class QuickListItemComponent {
 
   
   // Input is like the prop in react native 
-  @Input() item: string = "";
+  @Input() item: GroceryItem | null = null;
   
   // This is like the callback props in RN (OnPress, OnDelete..)
-  @Output() add = new EventEmitter<string>;
+  @Output() add = new EventEmitter<GroceryItem>();
   
   onItemAdd() {
-    this.add.emit(this.item);
+    this.item && this.add.emit(this.item);
   }
 
 }

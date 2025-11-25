@@ -56,7 +56,7 @@ export class QuickAddPage implements OnInit {
     this.location.back();
   }
 
-  displayedItems: string[] = [];
+  displayedItems: GroceryItem[] = [];
   currentIndex = 0;
   itemsPerLoad = 20;
 
@@ -83,7 +83,7 @@ export class QuickAddPage implements OnInit {
         this.currentIndex++;
         continue;
       }
-      this.displayedItems.push(item.name);
+      this.displayedItems.push(item);
       this.currentIndex++;
     }
   }
@@ -95,5 +95,6 @@ export class QuickAddPage implements OnInit {
 
   handleItemAdd(item: any) {
     console.log('Item added:', item);
+    this.groceryService.addItem(item);
   }
 }

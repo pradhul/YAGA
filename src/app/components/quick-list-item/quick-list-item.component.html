@@ -1,6 +1,11 @@
 <ion-item>
-  <ion-label>{{item}}</ion-label>
-  <ion-button fill="clear" slot="end"  (click)="onItemAdd()" >
-    <ion-icon slot="icon-only" color="dark" name="add-outline"></ion-icon>
-  </ion-button>
+  @if (item && item.name) {
+    <ion-label>{{item.name}}</ion-label>
+    <ion-button fill="clear" slot="end"  (click)="onItemAdd()" >
+      <ion-icon slot="icon-only" color="dark" name="add-outline"></ion-icon>
+    </ion-button>
+  }
+  @else {
+     <ion-label>No Items Available</ion-label>
+  }
 </ion-item>

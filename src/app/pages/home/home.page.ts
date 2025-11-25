@@ -27,11 +27,13 @@ import { Router } from '@angular/router';
 })
 export class HomePage {
 
-  groceryList: GroceryItem[] = [];
+  shoppingList: GroceryItem[] = [];
 
   constructor(private groceryService: GroceryService, private router: Router) {
     addIcons({ addOutline })
-    this.groceryList = this.groceryService.getCurrentGroceryList();
+    this.groceryService.currentGroceryList$.subscribe((list) => {
+      this.shoppingList = list;
+    });
   }
 
   navigateToQuickAdd() {
