@@ -1,3 +1,17 @@
+/**
+ * HOME PAGE EXPLANATION:
+ * 
+ * Observable ($): Like a live video feed - updates automatically when data changes
+ * Regular variable: Like a photo - stays the same until manually updated
+ * 
+ * combineLatest: Watches TWO things at once:
+ *   1. Timer (ticks every minute) 
+ *   2. Grocery list (changes when items added/removed)
+ *   When EITHER changes, it updates the display
+ * 
+ * Why? To show "5 minutes ago" that updates every minute + instant list updates
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonLabel, IonItem, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -36,18 +50,19 @@ export class HomePage {
   constructor(private groceryService: GroceryService, private router: Router) {
     addIcons({ addOutline });
 
-    const minuteClock$ = interval(1000).pipe(startWith(0));
+    // Timer: fires every 60 seconds (60000ms), starts immediately
+    const minuteClock$ = interval(60000).pipe(startWith(0));
+    // Live grocery list from service
     const groceryItems$ = this.groceryService.currentGroceryList$;
 
+    // combineLatest: "Hey! Either timer ticked OR list changed - update display!"
     this.shoppingList$ = combineLatest([minuteClock$, groceryItems$]).pipe(
-      map(([_, shoppingListItems]) => {
+      map(([_, shoppingListItems]) => { // _ = ignore timer value, just need the tick
         const now = Date.now();
         return shoppingListItems.map((shoppingListItem) => {
           if (shoppingListItem?._createdAt) {
             const itemAge = now - shoppingListItem?._createdAt;
-            const modifiedItem = { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
-            console.log(modifiedItem.age);
-            return modifiedItem;
+            return { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
           }
           return shoppingListItem;
         });
