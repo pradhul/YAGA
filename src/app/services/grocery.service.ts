@@ -24,8 +24,8 @@ export type GroceryItem = {
   age: Age;
   quantity: number;
   quantityMetric: "kg" | "gm" | "ml" | "l" | "count";
-  _createdAt?: Date;
-  _modifiedAt?: Date;
+  _createdAt?: number;
+  _modifiedAt?: number;
 };
 
 @Injectable({
@@ -207,6 +207,7 @@ export class GroceryService {
   //  Trigger the update
   addItem(item: GroceryItem): void {
     const list = this.getCurrentGroceryList();
+    item._createdAt = item._modifiedAt = Date.now();
     this.currentGroceryListSub.next([...list, item]);
   }
 
