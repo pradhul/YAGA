@@ -1,4 +1,4 @@
-import { Age } from "../services/grocery.service";
+import { Age } from "../shared/types";
 
 export function milliSecondsToAge(itemAge: number): Age {
   const PER_SECOND = 1000;

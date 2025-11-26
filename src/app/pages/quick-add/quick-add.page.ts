@@ -1,4 +1,4 @@
-import { Component, OnInit, Pipe } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import {
   IonContent,
@@ -10,7 +10,6 @@ import {
   IonIcon,
   IonSearchbar,
   IonList,
-  IonItem,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   SearchbarInputEventDetail,
@@ -19,8 +18,9 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { IonSearchbarCustomEvent } from '@ionic/core';
 import { QuickListItemComponent } from "src/app/components/quick-list-item/quick-list-item.component";
-import { GroceryItem, GroceryService } from 'src/app/services/grocery.service';
-import { BehaviorSubject, combineLatest, combineLatestWith, debounce, debounceTime, distinctUntilChanged, filter, map, Observable } from 'rxjs';
+import { GroceryService } from 'src/app/services/grocery.service';
+import { BehaviorSubject, combineLatestWith, debounceTime, distinctUntilChanged, map, Observable } from 'rxjs';
+import { GroceryItem } from 'src/app/shared/types';
 
 @Component({
   selector: 'app-quick-add',
