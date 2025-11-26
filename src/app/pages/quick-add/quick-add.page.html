@@ -7,6 +7,7 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+  <ion-content><ion-searchbar animated="true" placeholder="Search for items" (ionInput) = "onSearChange($event)"></ion-searchbar></ion-content>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -15,7 +16,6 @@
       <ion-title size="large">quick-add</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-searchbar animated="true" placeholder="Animated" (ionInput) = "onSearChange($event)"></ion-searchbar>
   <ion-list>
     @for (item of displayItems$ | async; track $index) {
       <app-quick-list-item
