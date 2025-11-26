@@ -17,7 +17,7 @@
   </ion-header>
   <ion-searchbar animated="true" placeholder="Animated" (ionInput) = "onSearChange($event)"></ion-searchbar>
   <ion-list>
-    @for (item of displayedItems; track $index) {
+    @for (item of displayItems$ | async; track $index) {
       <app-quick-list-item
       [item] = "item"
       (add) = "handleItemAdd($event)"
