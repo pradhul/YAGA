@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { DatabaseService } from './services/database.service';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,10 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private databaseService: DatabaseService) { }
+
+  async ngOnInit() {
+    // initialize an SQLite database foe persistence 
+    await this.databaseService.initializeDB();
+  }
 }

@@ -45,8 +45,11 @@ export class DatabaseService {
       age TEXT NOT NULL,
       quantity INTEGER NOT NULL,
       quantityMetric TEXT NOT NULL,
-      _createdAt INTEGER,
-      _modifiedAt INTEGER
+      addedAt INTEGER,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      deleted_at DATETIME,  -- For soft deletes
+      synced_at DATETIME    -- Tracks last successful sync
     );
     `;
     await this.dbConnection?.execute(query);
