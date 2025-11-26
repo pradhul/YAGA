@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Pipe } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import {
   IonContent,
@@ -20,6 +20,7 @@ import { arrowBackOutline } from 'ionicons/icons';
 import { IonSearchbarCustomEvent } from '@ionic/core';
 import { QuickListItemComponent } from "src/app/components/quick-list-item/quick-list-item.component";
 import { GroceryItem, GroceryService } from 'src/app/services/grocery.service';
+import { BehaviorSubject, combineLatest, combineLatestWith, debounce, debounceTime, distinctUntilChanged, filter, map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-quick-add',
@@ -42,54 +43,52 @@ import { GroceryItem, GroceryService } from 'src/app/services/grocery.service';
     QuickListItemComponent
   ],
 })
-export class QuickAddPage implements OnInit {
+export class QuickAddPage {
 
   searchTerm: string | undefined;
   groceryItems: GroceryItem[] = [];
+  displayedItems: GroceryItem[] = [];
+  itemsPerLoad = 20;
+
+  //  Search term stream
+  private searchTermSubject = new BehaviorSubject<string>("");
+  //  Page number stream 
+  private pageNumberSubject = new BehaviorSubject<number>(1);
+  // DisplayItems for UI
+  public displayItems$: Observable<GroceryItem[]>;
 
   constructor(private location: Location, private groceryService: GroceryService) {
     addIcons({ arrowBackOutline });
     this.groceryItems = this.groceryService.getAllGroceries();
+
+    //create filtered Items based on the search term and page number
+    this.displayItems$ = this.searchTermSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map((searchTerm) => {
+        if (!searchTerm) {
+          return this.groceryItems;
+        }
+        return this.groceryItems.filter((groceryItem) => groceryItem.name.toLowerCase().includes(searchTerm.toLowerCase()));
+      }),
+      combineLatestWith(this.pageNumberSubject),
+      map(([filteredItems, pageNumber]) => {
+        return filteredItems.slice(0, pageNumber * this.itemsPerLoad);
+      })
+    );
   }
 
   goBack() {
     this.location.back();
   }
 
-  displayedItems: GroceryItem[] = [];
-  currentIndex = 0;
-  itemsPerLoad = 20;
-
-  resetAndFilter() {
-    this.displayedItems = [];
-    this.currentIndex = 0;
-    this.loadMoreItems();
-  }
-
   onSearChange($event: IonSearchbarCustomEvent<SearchbarInputEventDetail>) {
     this.searchTerm = $event.detail.value?.toLowerCase();
-    this.resetAndFilter();
-  }
-
-  ngOnInit() {
-    this.loadMoreItems();
-  }
-
-  loadMoreItems() {
-    for (let i = 0; i < this.itemsPerLoad; i++) {
-      const item = this.groceryItems[this.currentIndex % this.groceryItems.length];
-      if (this.searchTerm && !item.name.toLocaleLowerCase().includes(this.searchTerm)
-      ) {
-        this.currentIndex++;
-        continue;
-      }
-      this.displayedItems.push(item);
-      this.currentIndex++;
-    }
+    this.searchTermSubject.next(this.searchTerm || "");
   }
 
   onScroll(event: any) {
-    this.loadMoreItems();
+    this.pageNumberSubject.next(this.pageNumberSubject.value + 1);
     event.target.complete();
   }
 
