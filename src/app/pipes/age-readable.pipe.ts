@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Age } from '../services/grocery.service';
+import { Age } from '../shared/types';
 
 /**
  * pipe to transform item elapsed time, age into readable format

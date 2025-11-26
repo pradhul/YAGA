@@ -15,13 +15,14 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonLabel, IonItem, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { GroceryService, GroceryItem } from '../../services/grocery.service';
 import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { combineLatest, interval, map, Observable, startWith, take, tap } from 'rxjs';
 import { milliSecondsToAge } from 'src/app/utils/dateUtils';
+import { GroceryService } from 'src/app/services/grocery.service';
+import { GroceryItem } from 'src/app/shared/types';
 
 @Component({
   selector: 'app-home',
@@ -60,8 +61,8 @@ export class HomePage {
       map(([_, shoppingListItems]) => { // _ = ignore timer value, just need the tick
         const now = Date.now();
         return shoppingListItems.map((shoppingListItem) => {
-          if (shoppingListItem?._createdAt) {
-            const itemAge = now - shoppingListItem?._createdAt;
+          if (shoppingListItem?.addedAt) {
+            const itemAge = now - shoppingListItem?.addedAt;
             return { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
           }
           return shoppingListItem;

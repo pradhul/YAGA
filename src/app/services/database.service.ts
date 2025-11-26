@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
-import { GroceryItem } from './grocery.service';
+import { GroceryItem } from '../shared/types';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +65,7 @@ export class DatabaseService {
         groceryItem.age,
         groceryItem.quantity,
         groceryItem.quantityMetric,
-        groceryItem._createdAt,
+        groceryItem.addedAt,
         groceryItem._modifiedAt
       ]
     );

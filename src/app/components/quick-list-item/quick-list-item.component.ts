@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonItem, IonLabel, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
-import { GroceryItem } from 'src/app/services/grocery.service';
+import { GroceryItem } from 'src/app/shared/types';
 
 @Component({
   selector: 'app-quick-list-item',
