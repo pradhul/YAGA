@@ -12,6 +12,7 @@ export class AppComponent {
 
   async ngOnInit() {
     // initialize an SQLite database foe persistence 
-    await this.databaseService.initializeDB();
+    // [commented out because web part is not functional for debugging now ]
+    // await this.databaseService.initializeDB();
   }
 }
