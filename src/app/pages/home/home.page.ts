@@ -14,15 +14,15 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonLabel, IonItem, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
+import { Router } from '@angular/router';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
-import { Router } from '@angular/router';
-import { combineLatest, interval, map, Observable, startWith, take, tap } from 'rxjs';
-import { milliSecondsToAge } from 'src/app/utils/dateUtils';
+import { combineLatest, interval, map, Observable, startWith } from 'rxjs';
 import { GroceryService } from 'src/app/services/grocery.service';
 import { GroceryItem } from 'src/app/shared/types';
+import { milliSecondsToAge } from 'src/app/utils/dateUtils';
+import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
 
 @Component({
   selector: 'app-home',
@@ -54,13 +54,13 @@ export class HomePage implements OnInit {
     // Timer: fires every 60 seconds (60000ms), starts immediately
     const minuteClock$ = interval(60000).pipe(startWith(0));
     // Live grocery list from service
-    const groceryItems$ = this.groceryService.currentGroceryList$;
+    const groceryItems$ = this.groceryService.getItems$();
 
     // combineLatest: "Hey! Either timer ticked OR list changed - update display!"
     this.shoppingList$ = combineLatest([minuteClock$, groceryItems$]).pipe(
-      map(([_, shoppingListItems]) => { // _ = ignore timer value, just need the tick
+      map(([_, groceryItems]) => { // _ = ignore timer value, just need the tick
         const now = Date.now();
-        return shoppingListItems.map((shoppingListItem) => {
+        return groceryItems.map((shoppingListItem) => {
           if (shoppingListItem?.addedAt) {
             const itemAge = now - shoppingListItem?.addedAt;
             return { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
@@ -72,7 +72,7 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.groceryService.getCurrentGroceryList();
+    // this.groceryService.getCurrentGroceryList();
   }
 
 
