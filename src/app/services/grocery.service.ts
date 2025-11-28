@@ -1,20 +1,32 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { collection, collectionData, CollectionReference, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { GroceryItem } from '../shared/types';
-import { FirebaseService } from './firebase.service';
-import { collection, doc, getDocs, getFirestore, setDoc } from "firebase/firestore";
-
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root"
 })
 export class GroceryService {
+  private groceriesCollection: CollectionReference;
 
-  constructor(private firebaseService: FirebaseService) {
+  constructor(private fireStore: Firestore) {
+    this.groceriesCollection = collection(this.fireStore, "groceries");
   }
 
-  private currentGroceryListSub = new BehaviorSubject<GroceryItem[]>([]);
-  public currentGroceryList$ = this.currentGroceryListSub.asObservable();
+  getItems$(): Observable<GroceryItem[]> {
+    return collectionData(this.groceriesCollection, { idField: 'id' }) as Observable<GroceryItem[]>;
+  }
+
+  async addItem(item: GroceryItem): Promise<boolean> {
+    try {
+      item.addedAt = item._modifiedAt = Date.now();
+      const docRef = await setDoc(doc(this.fireStore, 'groceries', item.name), item);
+      return true;
+    } catch (error) {
+      console.error("(GroceryService)", error);
+      return false;
+    }
+  }
 
   private allGroceries: GroceryItem[] = [
     {
@@ -178,32 +190,6 @@ export class GroceryService {
       quantityMetric: 'gm',
     },
   ];
-
-  //  Get the current GroceryList without subscribing
-  async getCurrentGroceryList(): Promise<GroceryItem[]> {
-
-    // clear the subject once
-    this.currentGroceryListSub.next([]);
-
-    const db = getFirestore(this.firebaseService.getFireStoreApp());
-    const querySnapshot = await getDocs(collection(db, "groceries"));
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-      this.currentGroceryListSub.next([...this.currentGroceryListSub.value, doc.data() as GroceryItem]);
-    });
-    return this.currentGroceryListSub.value;
-  }
-
-  //  Trigger the update
-  async addItem(item: GroceryItem): Promise<void> {
-    const list = await this.getCurrentGroceryList();
-    item.addedAt = item._modifiedAt = Date.now();
-    this.currentGroceryListSub.next([...list, item]);
-
-    const db = getFirestore(this.firebaseService.getFireStoreApp());
-    setDoc(doc(db, "groceries", item.name), item);
-  }
 
   getAllGroceries(): GroceryItem[] { return this.allGroceries; }
 }
