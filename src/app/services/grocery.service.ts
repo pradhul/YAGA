@@ -1,11 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { GroceryItem } from '../shared/types';
+import { FirebaseService } from './firebase.service';
+import { collection, doc, getDocs, getFirestore, setDoc } from "firebase/firestore";
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class GroceryService {
+
+  constructor(private firebaseService: FirebaseService) {
+  }
 
   private currentGroceryListSub = new BehaviorSubject<GroceryItem[]>([]);
   public currentGroceryList$ = this.currentGroceryListSub.asObservable();
@@ -174,15 +180,29 @@ export class GroceryService {
   ];
 
   //  Get the current GroceryList without subscribing
-  getCurrentGroceryList(): GroceryItem[] {
+  async getCurrentGroceryList(): Promise<GroceryItem[]> {
+
+    // clear the subject once
+    this.currentGroceryListSub.next([]);
+
+    const db = getFirestore(this.firebaseService.getFireStoreApp());
+    const querySnapshot = await getDocs(collection(db, "groceries"));
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      this.currentGroceryListSub.next([...this.currentGroceryListSub.value, doc.data() as GroceryItem]);
+    });
     return this.currentGroceryListSub.value;
   }
 
   //  Trigger the update
-  addItem(item: GroceryItem): void {
-    const list = this.getCurrentGroceryList();
+  async addItem(item: GroceryItem): Promise<void> {
+    const list = await this.getCurrentGroceryList();
     item.addedAt = item._modifiedAt = Date.now();
     this.currentGroceryListSub.next([...list, item]);
+
+    const db = getFirestore(this.firebaseService.getFireStoreApp());
+    setDoc(doc(db, "groceries", item.name), item);
   }
 
   getAllGroceries(): GroceryItem[] { return this.allGroceries; }

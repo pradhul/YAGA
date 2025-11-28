@@ -13,7 +13,7 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonLabel, IonItem, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
 import { addIcons } from 'ionicons';
@@ -42,7 +42,7 @@ import { GroceryItem } from 'src/app/shared/types';
     IonItem,
     AgeReadablePipe, IonIcon],
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
   // shoppingList: GroceryItem[] = [];
   public shoppingList$: Observable<GroceryItem[]>;
@@ -69,6 +69,10 @@ export class HomePage {
         });
       }),
     )
+  }
+
+  ngOnInit(): void {
+    this.groceryService.getCurrentGroceryList();
   }
 
 
