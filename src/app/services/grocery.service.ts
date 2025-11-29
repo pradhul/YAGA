@@ -1,26 +1,45 @@
 import { Injectable } from '@angular/core';
 import { collection, collectionData, CollectionReference, doc, Firestore, setDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { GroceryItem } from '../shared/types';
+import { DeviceIdService } from './deviceId.service';
 
 @Injectable({
   providedIn: "root"
 })
 export class GroceryService {
-  private groceriesCollection: CollectionReference;
 
-  constructor(private fireStore: Firestore) {
-    this.groceriesCollection = collection(this.fireStore, "groceries");
+  private collectionPath: string = "";
+
+  private groceriesCollection: CollectionReference | null = null;
+
+  private initializationPromise: Promise<void>;
+
+  constructor(private fireStore: Firestore, private deviceIdService: DeviceIdService) {
+    this.initializationPromise = this.initialize();
+  }
+
+  private async initialize(): Promise<void> {
+    let deviceId = await this.deviceIdService.getDeviceId();
+    this.collectionPath = `users/${deviceId}/groceries`;
+    this.groceriesCollection = collection(this.fireStore, this.collectionPath);
   }
 
   getItems$(): Observable<GroceryItem[]> {
-    return collectionData(this.groceriesCollection, { idField: 'id' }) as Observable<GroceryItem[]>;
+    return from(this.initializationPromise).pipe(
+      switchMap(() => {
+        if (!this.groceriesCollection) {
+          throw new Error("(GroceryService) not initialized");
+        }
+        return collectionData(this.groceriesCollection, { idField: 'id' }) as Observable<GroceryItem[]>;
+      })
+    )
   }
 
   async addItem(item: GroceryItem): Promise<boolean> {
     try {
       item.addedAt = item._modifiedAt = Date.now();
-      const docRef = await setDoc(doc(this.fireStore, 'groceries', item.name), item);
+      const docRef = await setDoc(doc(this.fireStore, this.collectionPath, item.name), item);
       return true;
     } catch (error) {
       console.error("(GroceryService)", error);
