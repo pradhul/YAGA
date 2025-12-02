@@ -13,13 +13,13 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { combineLatest, interval, map, Observable, startWith } from 'rxjs';
-import { GroceryService } from 'src/app/services/grocery.service';
+import { GroceryUserService } from 'src/app/services/grocery.user.service';
 import { GroceryItem } from 'src/app/shared/types';
 import { milliSecondsToAge } from 'src/app/utils/dateUtils';
 import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
@@ -42,13 +42,13 @@ import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
     IonItem,
     AgeReadablePipe, IonIcon],
 })
-export class HomePage implements OnInit {
+export class HomePage {
 
   // shoppingList: GroceryItem[] = [];
   public shoppingList$: Observable<GroceryItem[]>;
 
 
-  constructor(private groceryService: GroceryService, private router: Router) {
+  constructor(private groceryService: GroceryUserService, private router: Router) {
     addIcons({ addOutline });
 
     // Timer: fires every 60 seconds (60000ms), starts immediately
@@ -70,11 +70,6 @@ export class HomePage implements OnInit {
       }),
     )
   }
-
-  ngOnInit(): void {
-    // this.groceryService.getCurrentGroceryList();
-  }
-
 
   navigateToQuickAdd() {
     this.router.navigate(['quick-add']);

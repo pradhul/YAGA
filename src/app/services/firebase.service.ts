@@ -28,6 +28,4 @@ export class FirebaseService{
     (this.app)
     return result.response.text();
   }
-
-
 }
