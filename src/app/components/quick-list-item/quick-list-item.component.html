@@ -1,11 +1,19 @@
-<ion-item>
-  @if (item && item.name) {
-    <ion-label>{{item.name}}</ion-label>
-    <ion-button fill="clear" slot="end"  (click)="onItemAdd()" >
-      <ion-icon slot="icon-only" color="dark" name="add-outline"></ion-icon>
-    </ion-button>
-  }
-  @else {
-     <ion-label>No Items Available</ion-label>
-  }
-</ion-item>
+@if (item && item.name) {
+  <ion-card class="quick-list-item-card">
+    <ion-card-content>
+      <div class="item-content">
+        <h3 class="item-name">{{item.name}}</h3>
+        <ion-button fill="clear" size="small" class="add-button" (click)="onItemAdd()">
+          <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+}
+@else {
+  <ion-card class="quick-list-item-card">
+    <ion-card-content>
+      <p>No Items Available</p>
+    </ion-card-content>
+  </ion-card>
+}

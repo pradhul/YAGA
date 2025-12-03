@@ -5,6 +5,7 @@ export const AppConfig = {
   FIREBASE_COLLECTIONS: {
     GROCERIES: "groceries",
     USERS: "users",
-    USER_GROCERIES: (userId: string) => `users/${userId}/groceries`,
+    USER_GROCERY_LISTS: (userId: string) => `users/${userId}/groceryLists`,
+    USER_GROCERIES: (userId: string, groceryListId: string) => `users/${userId}/groceryLists/${groceryListId}/items`,
   }
 }

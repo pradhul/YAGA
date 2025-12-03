@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Shopping List
+      {{ groceryListName }}
     </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="navigateToQuickAdd()">
@@ -19,13 +19,27 @@
   </ion-header>
 
   <div id="container">
-    <ion-list>
-      @for (groceryItem of shoppingList$ | async; track groceryItem.name) {
-        <ion-item>
-          <ion-label>{{ groceryItem.name }}</ion-label>
-          <ion-label>{{ groceryItem.age | ageReadable }}</ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <ion-grid>
+      <ion-row>
+        @for (groceryItem of shoppingList$ | async; track groceryItem.name) {
+          <ion-col size="6">
+            <ion-card class="grocery-item-card">
+              <ion-card-content>
+                <div class="item-header">
+                  <h2 class="item-name">{{ groceryItem.name }}</h2>
+                  <ion-button fill="clear" size="small" class="add-button" (click)="navigateToQuickAdd()">
+                    <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                  </ion-button>
+                </div>
+                <ion-chip class="quantity-chip">
+                  <ion-label>{{ groceryItem.quantity }} {{ groceryItem.quantityMetric }}</ion-label>
+                </ion-chip>
+                <p class="item-age">{{ groceryItem.age | ageReadable }}</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
   </div>
 </ion-content>

@@ -38,7 +38,6 @@ import { GroceryItem } from 'src/app/shared/types';
     IonButton,
     IonIcon,
     IonSearchbar,
-    IonList,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     QuickListItemComponent

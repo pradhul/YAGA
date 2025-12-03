@@ -1,0 +1,15 @@
+.staggered-grid-container {
+  padding: 8px;
+  margin-top: 50px;
+}
+
+.staggered-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+app-quick-list-item {
+  display: block;
+}

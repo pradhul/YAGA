@@ -15,7 +15,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonItemGroup, IonLabel, IonList, IonRow, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { combineLatest, interval, map, Observable, startWith } from 'rxjs';
@@ -40,11 +40,19 @@ import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
     IonButton,
     IonLabel,
     IonItem,
+    IonItemGroup,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonChip,
+    IonCard,
+    IonCardContent,
     AgeReadablePipe, IonIcon],
 })
 export class HomePage {
 
-  // shoppingList: GroceryItem[] = [];
+  protected groceryListName: string = "Shopping  List1";
+
   public shoppingList$: Observable<GroceryItem[]>;
 
 
@@ -53,6 +61,7 @@ export class HomePage {
 
     // Timer: fires every 60 seconds (60000ms), starts immediately
     const minuteClock$ = interval(60000).pipe(startWith(0));
+
     // Live grocery list from service
     const groceryItems$ = this.groceryService.getItems$();
 

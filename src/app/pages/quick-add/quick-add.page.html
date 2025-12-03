@@ -16,15 +16,17 @@
       <ion-title size="large">quick-add</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-list>
-    @for (item of displayItems$ | async; track $index) {
-      <app-quick-list-item
-      [item] = "item"
-      (add) = "handleItemAdd($event)"
-      >
-      </app-quick-list-item>
-    }
-  </ion-list>
+  <div class="staggered-grid-container">
+    <div class="staggered-grid">
+      @for (item of displayItems$ | async; track $index) {
+        <app-quick-list-item
+        [item] = "item"
+        (add) = "handleItemAdd($event)"
+        >
+        </app-quick-list-item>
+      }
+    </div>
+  </div>
   <ion-infinite-scroll (ionInfinite)="onScroll($event)">
   <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
