@@ -31,7 +31,12 @@ app-quick-list-item {
   margin-bottom: 8px;
 
   ion-input {
-    color:  #000000;
+    --color: #000000;
+    
+    &::part(native) {
+      color: #000000;
+    }
+  }
 }
 
 .custom-item {
@@ -60,8 +65,13 @@ app-quick-list-item {
 
 .custom-input {
   --padding-start: 0;
+  --color: #000000;
   font-size: 16px;
   font-weight: 500;
+  
+  &::part(native) {
+    color: #000000;
+  }
 }
 
 .button-container {
