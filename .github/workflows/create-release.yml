@@ -1,0 +1,105 @@
+name: Create Release
+
+on:
+  workflow_run:
+    workflows: ["Build Android APK"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == 'master') }}
+    permissions:
+      contents: write
+      actions: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download APK artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          name: android-apk
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: build-android-apk.yml
+          run_id: ${{ github.event.workflow_run.id }}
+          path: ./artifacts
+
+      - name: Read current version
+        id: version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Parse version (e.g., "0.0.1" -> major=0, minor=0, patch=1)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          
+          # If version is 0.0.x, start from 0.1.1
+          if [ "$major" = "0" ] && [ "$minor" = "0" ]; then
+            NEW_VERSION="0.1.1"
+          else
+            # Increment patch version
+            patch=$((patch + 1))
+            NEW_VERSION="$major.$minor.$patch"
+          fi
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+          echo "New version: $NEW_VERSION"
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ steps.version.outputs.new_version }} --no-git-tag-version
+          cat package.json | grep version
+
+      - name: Find APK file
+        id: find_apk
+        run: |
+          APK_FILE=$(find ./artifacts -name "*.apk" | head -n 1)
+          APK_NAME=$(basename "$APK_FILE")
+          echo "apk_file=$APK_FILE" >> $GITHUB_OUTPUT
+          echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+          echo "Found APK: $APK_FILE"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          name: Release v${{ steps.version.outputs.new_version }}
+          body: |
+            ## Release v${{ steps.version.outputs.new_version }}
+            
+            Automated release created from successful build.
+            
+            ### Changes
+            - Patch version incremented from ${{ steps.version.outputs.current_version }} to ${{ steps.version.outputs.new_version }}
+            
+            ### Downloads
+            - APK: ${{ steps.find_apk.outputs.apk_name }}
+          files: ${{ steps.find_apk.outputs.apk_file }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit version bump
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]" || exit 0
+          git push
+
