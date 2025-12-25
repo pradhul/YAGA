@@ -8,7 +8,22 @@
 const fs = require('fs');
 const path = require('path');
 
-const buildGradlePath = path.join(__dirname, '..', 'android', 'build.gradle');
+const androidDir = path.join(__dirname, '..', 'android');
+const buildGradlePath = path.join(androidDir, 'build.gradle');
+const gradlePropertiesPath = path.join(androidDir, 'gradle.properties');
+
+// Also set in gradle.properties for earlier evaluation
+if (fs.existsSync(gradlePropertiesPath)) {
+  let gradleProps = fs.readFileSync(gradlePropertiesPath, 'utf8');
+  
+  // Ensure we have the Java toolchain setting (but don't force a specific version here)
+  // The build.gradle override will handle the actual version
+  if (!gradleProps.includes('# Java version override')) {
+    gradleProps += '\n# Java version override - see build.gradle subprojects block\n';
+    fs.writeFileSync(gradlePropertiesPath, gradleProps, 'utf8');
+    console.log('✓ Updated gradle.properties');
+  }
+}
 
 if (!fs.existsSync(buildGradlePath)) {
   console.warn('android/build.gradle not found. Skipping Java version fix.');
@@ -18,18 +33,20 @@ if (!fs.existsSync(buildGradlePath)) {
 let content = fs.readFileSync(buildGradlePath, 'utf8');
 
 // Check if the fix is already applied
-if (content.includes('JavaVersion.VERSION_17') && content.includes('// Override Java version')) {
-  console.log('Java version fix already applied.');
+const fixMarker = '// Override Java version from capacitor.build.gradle';
+if (content.includes(fixMarker)) {
+  console.log('Java version fix already applied to build.gradle.');
   process.exit(0);
 }
 
-// Find the allprojects block and add the subprojects configuration after it
-const allprojectsEndRegex = /(allprojects\s*\{[^}]*\})/s;
+// The fix block to add - this will override Java 21 with Java 17 for all subprojects
+// Using afterEvaluate to ensure it runs after plugin configuration
 const javaVersionFix = `
 // Override Java version from capacitor.build.gradle (which uses Java 21)
 // This ensures all Android modules use Java 17
 subprojects {
     afterEvaluate { project ->
+        // Override for Android projects
         if (project.hasProperty('android')) {
             project.android {
                 compileOptions {
@@ -38,24 +55,38 @@ subprojects {
                 }
             }
         }
+        // Override for Java/Java-library projects
+        def javaExtension = project.extensions.findByName('java')
+        if (javaExtension != null) {
+            javaExtension.sourceCompatibility = JavaVersion.VERSION_17
+            javaExtension.targetCompatibility = JavaVersion.VERSION_17
+        }
+        // Override Java compilation tasks directly for extra safety
+        project.tasks.withType(JavaCompile).configureEach {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
+        }
     }
-}`;
-
-if (allprojectsEndRegex.test(content)) {
-  // Insert the fix after the allprojects block
-  content = content.replace(allprojectsEndRegex, `$1${javaVersionFix}`);
-  fs.writeFileSync(buildGradlePath, content, 'utf8');
-  console.log('✓ Fixed Java version to 17 in android/build.gradle');
-} else {
-  // Fallback: add it before the clean task
-  const cleanTaskRegex = /(task clean)/;
-  if (cleanTaskRegex.test(content)) {
-    content = content.replace(cleanTaskRegex, `${javaVersionFix}\n\n$1`);
-    fs.writeFileSync(buildGradlePath, content, 'utf8');
-    console.log('✓ Fixed Java version to 17 in android/build.gradle');
-  } else {
-    console.error('Could not find insertion point in build.gradle');
-    process.exit(1);
-  }
 }
+`;
+
+// Try to find a good insertion point - after allprojects block
+// The regex needs to handle nested braces properly
+const allprojectsPattern = /(allprojects\s*\{[^}]*(?:\{[^}]*(?:\{[^}]*\}[^}]*)*\}[^}]*)*\})/s;
+const match = content.match(allprojectsPattern);
+
+if (match) {
+  // Insert after allprojects block
+  const insertPos = match.index + match[0].length;
+  content = content.slice(0, insertPos) + javaVersionFix + content.slice(insertPos);
+  fs.writeFileSync(buildGradlePath, content, 'utf8');
+  console.log('✓ Fixed Java version to 17 in android/build.gradle (after allprojects)');
+} else {
+  // Fallback: append at the end of the file
+  content += javaVersionFix;
+  fs.writeFileSync(buildGradlePath, content, 'utf8');
+  console.log('✓ Fixed Java version to 17 in android/build.gradle (appended)');
+}
+
+console.log('✓ Java version fix completed');
 
