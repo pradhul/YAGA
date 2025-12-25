@@ -40,10 +40,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Capacitor Android platform
+      - name: Add Android platform (if not exists)
         run: |
           if [ ! -d "android" ]; then
-            npm install @capacitor/android
             npx cap add android
           fi
 
