@@ -1,1 +1,1 @@
-export { GroceryItem, Age, Category } from './grocery-item.type';
+export { GroceryItem, GroceryItemWithId, Age, Category } from './grocery-item.type';

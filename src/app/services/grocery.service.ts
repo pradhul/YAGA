@@ -1,32 +1,42 @@
 import { Injectable } from '@angular/core';
 import { collection, collectionData, CollectionReference, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { from, Observable, switchMap } from 'rxjs';
+import { AppConfig } from '../config/app.config';
 import { GroceryItem } from '../shared/types';
-import { DeviceIdService } from './deviceId.service';
 
 @Injectable({
   providedIn: "root"
 })
 export class GroceryService {
 
-  private collectionPath: string = "";
+  protected collectionPath: string = "";
 
-  private groceriesCollection: CollectionReference | null = null;
+  protected groceriesCollection: CollectionReference | null = null;
 
-  private initializationPromise: Promise<void>;
+  protected initializationPromise: Promise<void> | null = null;
 
-  constructor(private fireStore: Firestore, private deviceIdService: DeviceIdService) {
-    this.initializationPromise = this.initialize();
+  constructor(protected fireStore: Firestore) {
   }
 
-  private async initialize(): Promise<void> {
-    let deviceId = await this.deviceIdService.getDeviceId();
-    this.collectionPath = `users/${deviceId}/groceries`;
+  protected async initialize(): Promise<void> {
+    this.collectionPath = AppConfig.FIREBASE_COLLECTIONS.GROCERIES;
     this.groceriesCollection = collection(this.fireStore, this.collectionPath);
   }
 
+  /**
+   * Ensure the service has been initialized before use.
+   * This is lazy to avoid calling overridden methods from the base constructor.
+   */
+  protected ensureInitialized(): Promise<void> {
+    if (!this.initializationPromise) {
+      this.initializationPromise = this.initialize();
+    }
+    return this.initializationPromise;
+  }
+
+
   getItems$(): Observable<GroceryItem[]> {
-    return from(this.initializationPromise).pipe(
+    return from(this.ensureInitialized()).pipe(
       switchMap(() => {
         if (!this.groceriesCollection) {
           throw new Error("(GroceryService) not initialized");
@@ -38,177 +48,15 @@ export class GroceryService {
 
   async addItem(item: GroceryItem): Promise<boolean> {
     try {
+      // Ensure collection is ready before adding
+      await this.ensureInitialized();
       item.addedAt = item._modifiedAt = Date.now();
       const docRef = await setDoc(doc(this.fireStore, this.collectionPath, item.name), item);
       return true;
     } catch (error) {
-      console.error("(GroceryService)", error);
+      console.log('Error adding item: at: ', this.collectionPath, item);
+      console.error("(GroceryService)----", error, this.collectionPath, item.name);
       return false;
     }
   }
-
-  private allGroceries: GroceryItem[] = [
-    {
-      name: 'Apples 🍎',
-      category: 'Fruit',
-      bought: false,
-      age: '2day',
-      quantity: 6,
-      quantityMetric: 'count',
-    },
-    {
-      name: 'Bananas 🍌',
-      category: 'Fruit',
-      bought: true,
-      age: '1day',
-      quantity: 1,
-      quantityMetric: 'kg',
-    },
-    {
-      name: 'Bread 🍞',
-      category: 'Grains & Flours',
-      bought: false,
-      age: 'now',
-      quantity: 1,
-      quantityMetric: 'count',
-    },
-    {
-      name: 'Milk 🥛',
-      category: 'Dairy',
-      bought: true,
-      age: '1hour',
-      quantity: 1,
-      quantityMetric: 'l',
-    },
-    {
-      name: 'Eggs 🥚',
-      category: 'Fish, Meat & egg',
-      bought: false,
-      age: '4day',
-      quantity: 12,
-      quantityMetric: 'count',
-    },
-    {
-      name: 'Cheese 🧀',
-      category: 'Dairy',
-      bought: true,
-      age: '1week',
-      quantity: 200,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Chicken 🍗',
-      category: 'Fish, Meat & egg',
-      bought: false,
-      age: 'now',
-      quantity: 500,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Rice 🍙',
-      category: 'Grains & Flours',
-      bought: true,
-      age: '1month',
-      quantity: 5,
-      quantityMetric: 'kg',
-    },
-    {
-      name: 'Pasta 🍝',
-      category: 'Grains & Flours',
-      bought: false,
-      age: '3month',
-      quantity: 500,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Tomatoes 🍅',
-      category: 'vegetable',
-      bought: true,
-      age: '1day',
-      quantity: 500,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Onions 🧅',
-      category: 'vegetable',
-      bought: false,
-      age: '2week',
-      quantity: 1,
-      quantityMetric: 'kg',
-    },
-    {
-      name: 'Potatoes 🥔',
-      category: 'vegetable',
-      bought: true,
-      age: '3day',
-      quantity: 2,
-      quantityMetric: 'kg',
-    },
-    {
-      name: 'Carrots 🥕',
-      category: 'vegetable',
-      bought: false,
-      age: '5day',
-      quantity: 500,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Lettuce 🥗',
-      category: 'vegetable',
-      bought: true,
-      age: '1day',
-      quantity: 1,
-      quantityMetric: 'count',
-    },
-    {
-      name: 'Yogurt 🍦',
-      category: 'Dairy',
-      bought: false,
-      age: 'now',
-      quantity: 500,
-      quantityMetric: 'ml',
-    },
-    {
-      name: 'Butter 🧈',
-      category: 'Dairy',
-      bought: true,
-      age: '10day',
-      quantity: 250,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Coffee ☕',
-      category: 'Beverages',
-      bought: false,
-      age: '1year',
-      quantity: 250,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Tea 🍃',
-      category: 'Beverages',
-      bought: true,
-      age: '6month',
-      quantity: 100,
-      quantityMetric: 'gm',
-    },
-    {
-      name: 'Sugar 🍬',
-      category: 'Other', // Sugar is often classified as a sweetener/pantry staple, 'Other' is a safe choice.
-      bought: false,
-      age: '1year',
-      quantity: 1,
-      quantityMetric: 'kg',
-    },
-    {
-      name: 'Salt 🧂',
-      category: 'Other', // Salt is a seasoning/pantry staple, 'Other' is a safe choice.
-      bought: true,
-      age: '2year',
-      quantity: 500,
-      quantityMetric: 'gm',
-    },
-  ];
-
-  getAllGroceries(): GroceryItem[] { return this.allGroceries; }
 }

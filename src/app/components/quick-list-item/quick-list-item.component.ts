@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IonItem, IonLabel, IonButton, IonIcon } from "@ionic/angular/standalone";
+import { IonButton, IonCard, IonCardContent, IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { GroceryItem } from 'src/app/shared/types';
@@ -8,7 +8,7 @@ import { GroceryItem } from 'src/app/shared/types';
   selector: 'app-quick-list-item',
   templateUrl: './quick-list-item.component.html',
   styleUrls: ['./quick-list-item.component.scss'],
-  imports: [IonIcon, IonLabel, IonItem, IonButton],
+  imports: [IonIcon, IonCard, IonCardContent, IonButton],
 })
 export class QuickListItemComponent {
 

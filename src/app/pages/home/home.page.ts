@@ -13,14 +13,14 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonLabel, IonRow, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { combineLatest, interval, map, Observable, startWith } from 'rxjs';
-import { GroceryService } from 'src/app/services/grocery.service';
-import { GroceryItem } from 'src/app/shared/types';
+import { GroceryUserService } from 'src/app/services/grocery.user.service';
+import { GroceryItem, GroceryItemWithId } from 'src/app/shared/types';
 import { milliSecondsToAge } from 'src/app/utils/dateUtils';
 import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
 
@@ -35,24 +35,30 @@ import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
     IonTitle,
     IonButtons,
     IonContent,
-    IonList,
     IonIcon,
     IonButton,
     IonLabel,
-    IonItem,
-    AgeReadablePipe, IonIcon],
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonChip,
+    IonCard,
+    IonCardContent,
+    AgeReadablePipe],
 })
-export class HomePage implements OnInit {
+export class HomePage {
 
-  // shoppingList: GroceryItem[] = [];
-  public shoppingList$: Observable<GroceryItem[]>;
+  protected groceryListName: string = "Shopping  List1";
+
+  public shoppingList$: Observable<GroceryItemWithId[]>;
 
 
-  constructor(private groceryService: GroceryService, private router: Router) {
+  constructor(private groceryService: GroceryUserService, private router: Router) {
     addIcons({ addOutline });
 
     // Timer: fires every 60 seconds (60000ms), starts immediately
     const minuteClock$ = interval(60000).pipe(startWith(0));
+
     // Live grocery list from service
     const groceryItems$ = this.groceryService.getItems$();
 
@@ -60,24 +66,42 @@ export class HomePage implements OnInit {
     this.shoppingList$ = combineLatest([minuteClock$, groceryItems$]).pipe(
       map(([_, groceryItems]) => { // _ = ignore timer value, just need the tick
         const now = Date.now();
-        return groceryItems.map((shoppingListItem) => {
+        // groceryItems already have id field from collectionData with idField: 'id'
+        const itemsWithId = groceryItems as GroceryItemWithId[];
+        return itemsWithId.map((shoppingListItem) => {
           if (shoppingListItem?.addedAt) {
             const itemAge = now - shoppingListItem?.addedAt;
             return { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
           }
-          return shoppingListItem;
+          return { ...shoppingListItem, age: 'now' as const };
         });
       }),
     )
   }
 
-  ngOnInit(): void {
-    // this.groceryService.getCurrentGroceryList();
-  }
-
-
   navigateToQuickAdd() {
     this.router.navigate(['quick-add']);
+  }
+
+  changeItemQuantity({quantity, quantityMetric}: GroceryItem) {
+    console.log(quantity, quantityMetric);
+  }
+
+  async toggleItemBought(groceryItem: GroceryItemWithId) {
+    try {
+      // Get the current active grocery list ID
+      const listID = await this.groceryService.getUserGroceryListId();
+
+      // Toggle the bought field: if currently truthy (true or string), set to false; otherwise set to true
+      const currentBought = groceryItem.bought;
+      const newBought = currentBought ? false : true;
+
+      // Update the item using updateGroceryItem
+      await this.groceryService.updateGroceryItem(groceryItem.id, listID, { bought: newBought });
+    } catch (error) {
+      console.error("(HomePage) Error toggling item bought status:", error);
+      console.error("GroceryItem:", groceryItem);
+    }
   }
 }
 

@@ -1,0 +1,124 @@
+.staggered-grid-container {
+  padding: 8px;
+  margin-top: 50px;
+}
+
+.staggered-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+app-quick-list-item {
+  display: block;
+}
+
+// Modal Styles
+.modal-content {
+  --background: var(--ion-background-color, #ffffff);
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 200px;
+}
+
+.input-container {
+  margin-bottom: 8px;
+
+  ion-input {
+    --color: #000000;
+    
+    &::part(native) {
+      color: #000000;
+    }
+  }
+}
+
+.custom-item {
+  --background: var(--ion-color-light, #f4f5f8);
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:focus-within {
+    --background: var(--ion-color-light-shade, #e7e8eb);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+}
+
+.input-icon {
+  color: var(--ion-color-primary, #3880ff);
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+.custom-input {
+  --padding-start: 0;
+  --color: #000000;
+  font-size: 16px;
+  font-weight: 500;
+  
+  &::part(native) {
+    color: #000000;
+  }
+}
+
+.button-container {
+  margin-top: 8px;
+}
+
+.add-button {
+  --background: var(--ion-color-primary, #3880ff);
+  --background-activated: var(--ion-color-primary-shade, #3171e0);
+  --background-hover: var(--ion-color-primary-tint, #4c8dff);
+  --color: white;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  --border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(56, 128, 255, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(56, 128, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &[disabled] {
+    --background: var(--ion-color-medium, #92949c);
+    --background-activated: var(--ion-color-medium, #92949c);
+    --background-hover: var(--ion-color-medium, #92949c);
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none;
+  }
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .custom-item {
+    --background: var(--ion-color-dark, #2d2d2d);
+    
+    &:focus-within {
+      --background: var(--ion-color-dark-shade, #1f1f1f);
+    }
+  }
+}
