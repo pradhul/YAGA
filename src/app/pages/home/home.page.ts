@@ -20,7 +20,7 @@ import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { combineLatest, interval, map, Observable, startWith } from 'rxjs';
 import { GroceryUserService } from 'src/app/services/grocery.user.service';
-import { GroceryItem } from 'src/app/shared/types';
+import { GroceryItem, GroceryItemWithId } from 'src/app/shared/types';
 import { milliSecondsToAge } from 'src/app/utils/dateUtils';
 import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
 
@@ -50,7 +50,7 @@ export class HomePage {
 
   protected groceryListName: string = "Shopping  List1";
 
-  public shoppingList$: Observable<GroceryItem[]>;
+  public shoppingList$: Observable<GroceryItemWithId[]>;
 
 
   constructor(private groceryService: GroceryUserService, private router: Router) {
@@ -66,7 +66,9 @@ export class HomePage {
     this.shoppingList$ = combineLatest([minuteClock$, groceryItems$]).pipe(
       map(([_, groceryItems]) => { // _ = ignore timer value, just need the tick
         const now = Date.now();
-        return groceryItems.map((shoppingListItem) => {
+        // groceryItems already have id field from collectionData with idField: 'id'
+        const itemsWithId = groceryItems as GroceryItemWithId[];
+        return itemsWithId.map((shoppingListItem) => {
           if (shoppingListItem?.addedAt) {
             const itemAge = now - shoppingListItem?.addedAt;
             return { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
@@ -83,6 +85,23 @@ export class HomePage {
 
   changeItemQuantity({quantity, quantityMetric}: GroceryItem) {
     console.log(quantity, quantityMetric);
+  }
+
+  async toggleItemBought(groceryItem: GroceryItemWithId) {
+    try {
+      // Get the current active grocery list ID
+      const listID = await this.groceryService.getUserGroceryListId();
+
+      // Toggle the bought field: if currently truthy (true or string), set to false; otherwise set to true
+      const currentBought = groceryItem.bought;
+      const newBought = currentBought ? false : true;
+
+      // Update the item using updateGroceryItem
+      await this.groceryService.updateGroceryItem(groceryItem.id, listID, { bought: newBought });
+    } catch (error) {
+      console.error("(HomePage) Error toggling item bought status:", error);
+      console.error("GroceryItem:", groceryItem);
+    }
   }
 }
 

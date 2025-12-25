@@ -22,11 +22,11 @@
     <ion-grid>
       <ion-row>
         @for (groceryItem of shoppingList$ | async; track groceryItem.name) {
-          <ion-col size="6">
-            <ion-card class="grocery-item-card">
+          <ion-col size="6" (click)="toggleItemBought(groceryItem)">
+            <ion-card class="grocery-item-card" [class.bought]="groceryItem.bought">
               <ion-card-content>
                 <div class="item-header">
-                  <h2 class="item-name">{{ groceryItem.name }}</h2>
+                  <h2 class="item-name" [class.strike-through]="groceryItem.bought">{{ groceryItem.name }}</h2>
                   <ion-button fill="clear" size="medium" class="add-button" (click)="changeItemQuantity(groceryItem)">
                     <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                   </ion-button>

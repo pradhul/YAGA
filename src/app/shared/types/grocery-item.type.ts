@@ -26,3 +26,5 @@ export type GroceryItem = {
   _modifiedAt?: number;
   emoji: string;
 };
+
+export type GroceryItemWithId = GroceryItem & { id: string };

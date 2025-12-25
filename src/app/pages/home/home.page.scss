@@ -56,3 +56,13 @@ ion-card-content {
   margin-top: auto;
 }
 
+.grocery-item-card.bought {
+  opacity: 0.6;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.item-name.strike-through {
+  text-decoration: line-through;
+  color: var(--ion-color-medium);
+}
+
