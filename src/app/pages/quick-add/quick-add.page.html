@@ -10,24 +10,75 @@
   <ion-content><ion-searchbar animated="true" placeholder="Search for items" (ionInput) = "onSearChange($event)"></ion-searchbar></ion-content>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" fixed-slot-placement="before">
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button id="addNewGroceryItem" >
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">quick-add</ion-title>
     </ion-toolbar>
   </ion-header>
+
   <div class="staggered-grid-container">
     <div class="staggered-grid">
       @for (item of displayItems$ | async; track $index) {
         <app-quick-list-item
         [item] = "item"
-        (add) = "handleItemAdd($event)"
+        (add) = "addItemToUserGroceryList($event)"
         >
         </app-quick-list-item>
       }
     </div>
   </div>
+
   <ion-infinite-scroll (ionInfinite)="onScroll($event)">
-  <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
+
+  <ion-modal #modal trigger="addNewGroceryItem" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5, 0.75, 1]">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Add New Item</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="closeModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="modal-content">
+        <div class="modal-body">
+          <div class="input-container">
+            <ion-item class="custom-item" lines="none">
+              <ion-icon slot="start" name="create-outline" class="input-icon"></ion-icon>
+              <ion-input 
+                type="text" 
+                placeholder="Enter item name" 
+                [value]="newGroceryItemName"
+                (ionInput)="onNewItemInput($event)"
+                class="custom-input">
+              </ion-input>
+            </ion-item>
+          </div>
+          <div class="button-container">
+            <ion-button 
+              expand="block" 
+              shape="round" 
+              (click)="addNewGroceryItem()"
+              [disabled]="!newGroceryItemName || !newGroceryItemName.trim()"
+              class="add-button">
+              <ion-icon slot="start" name="add-outline"></ion-icon>
+              Add Item
+            </ion-button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

@@ -4,8 +4,8 @@
       {{ groceryListName }}
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="navigateToQuickAdd()">
-        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      <ion-button size="large" (click)="navigateToQuickAdd()">
+        <ion-icon slot="icon-only"  name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -27,14 +27,14 @@
               <ion-card-content>
                 <div class="item-header">
                   <h2 class="item-name">{{ groceryItem.name }}</h2>
-                  <ion-button fill="clear" size="small" class="add-button" (click)="navigateToQuickAdd()">
+                  <ion-button fill="clear" size="medium" class="add-button" (click)="changeItemQuantity(groceryItem)">
                     <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                   </ion-button>
                 </div>
                 <ion-chip class="quantity-chip">
                   <ion-label>{{ groceryItem.quantity }} {{ groceryItem.quantityMetric }}</ion-label>
                 </ion-chip>
-                <p class="item-age">{{ groceryItem.age | ageReadable }}</p>
+                <p class="item-age">{{ (groceryItem.age || 'now') | ageReadable }}</p>
               </ion-card-content>
             </ion-card>
           </ion-col>

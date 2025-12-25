@@ -15,7 +15,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonItemGroup, IonLabel, IonList, IonRow, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonLabel, IonRow, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
 import { combineLatest, interval, map, Observable, startWith } from 'rxjs';
@@ -35,19 +35,16 @@ import { AgeReadablePipe } from '../../pipes/age-readable.pipe';
     IonTitle,
     IonButtons,
     IonContent,
-    IonList,
     IonIcon,
     IonButton,
     IonLabel,
-    IonItem,
-    IonItemGroup,
     IonGrid,
     IonRow,
     IonCol,
     IonChip,
     IonCard,
     IonCardContent,
-    AgeReadablePipe, IonIcon],
+    AgeReadablePipe],
 })
 export class HomePage {
 
@@ -74,7 +71,7 @@ export class HomePage {
             const itemAge = now - shoppingListItem?.addedAt;
             return { ...shoppingListItem, age: milliSecondsToAge(itemAge) };
           }
-          return shoppingListItem;
+          return { ...shoppingListItem, age: 'now' as const };
         });
       }),
     )
@@ -82,6 +79,10 @@ export class HomePage {
 
   navigateToQuickAdd() {
     this.router.navigate(['quick-add']);
+  }
+
+  changeItemQuantity({quantity, quantityMetric}: GroceryItem) {
+    console.log(quantity, quantityMetric);
   }
 }
 

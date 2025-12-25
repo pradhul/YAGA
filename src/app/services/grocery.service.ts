@@ -54,7 +54,8 @@ export class GroceryService {
       const docRef = await setDoc(doc(this.fireStore, this.collectionPath, item.name), item);
       return true;
     } catch (error) {
-      console.error("(GroceryService)", error);
+      console.log('Error adding item: at: ', this.collectionPath, item);
+      console.error("(GroceryService)----", error, this.collectionPath, item.name);
       return false;
     }
   }
